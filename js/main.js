@@ -58,8 +58,41 @@ document.body.prepend(app.view);
 
 let flock = new Flock(opt.boids);
 
+// Add these near the top with other global variables
+g.beatInterval = 500; // Adjust this value to change beat speed (in milliseconds)
+g.lastBeatTime = 0;
+g.isBeat = false;
+g.beatIntensity = 0;
+
+// Add this function to handle beat updates
+function updateBeat() {
+  const currentTime = Date.now();
+  
+  // Update beat state
+  if (currentTime - g.lastBeatTime >= g.beatInterval) {
+    g.lastBeatTime = currentTime;
+    g.isBeat = true;
+    g.beatIntensity = 1;
+  } else {
+    g.isBeat = false;
+    // Smooth decay of beat intensity
+    g.beatIntensity *= 0.95;
+  }
+  
+  // Modify cohesion based on beat
+  if (g.isBeat) {
+    opt.cohesion = Math.max(0, opt.cohesion - 0.5); // Sharp decrease on beat
+  } else {
+    opt.cohesion = Math.min(1, opt.cohesion + 0.02); // Gradual recovery
+  }
+}
+
+// Modify the existing loop function to include beat updates
 function loop(delta) {
-	g.delta = delta;
+  g.delta = delta;
+  
+  // Add beat update
+  updateBeat();
 
 	g.mouseForce = max(
 		(opt.maxSpeed *

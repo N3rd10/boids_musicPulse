@@ -92,8 +92,27 @@ function loop(delta) {
   g.delta = delta;
   
   // Add beat update
+   // Add these lines
   updateBeat();
+  updateCohesionOnBeat();
 
+  g.mouseForce = max(
+    (opt.maxSpeed *
+      opt.maxForce *
+      (opt.alignment + opt.cohesion + opt.separation + 1)) /
+      16,
+    0
+  );
+  g.sqVis = opt.vision * opt.vision;
+
+  if (!opt.paused) {
+    flock.update();
+  } else if (g.nextFrame) {
+    flock.update();
+    g.nextFrame = false;
+  }
+
+  flock.draw();
 	g.mouseForce = max(
 		(opt.maxSpeed *
 			opt.maxForce *
